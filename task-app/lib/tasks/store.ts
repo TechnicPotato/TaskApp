@@ -17,3 +17,10 @@ export function createTask(inputDetails: CreateTaskInput): Task {
   };
   return newTask;
 }
+
+export type TaskStore = {
+  createTask(input: CreateTaskInput): Promise<Task>;
+  deleteTask(id: string): Promise<boolean>;
+  listTasks(): Promise<Task[]>;
+  updateTaskStatus(id: string): Promise<Task | null>;
+};
