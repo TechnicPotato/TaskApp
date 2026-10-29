@@ -36,7 +36,7 @@ export function createInMemoryTaskStore(): TaskStore {
     async toggleStatus(id) {
       // Replaces rather than mutates, so caller doesn't hold a reference into storage.
       const task = storage.get(id);
-      if (task == undefined) return null;
+      if (task === undefined) return null;
 
       const updated = { ...task, done: !task.done };
       storage.set(id, updated);
