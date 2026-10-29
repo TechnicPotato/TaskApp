@@ -1,26 +1,47 @@
 import type { Task, CreateTaskInput } from "./types";
-import { randomUUID } from "crypto";
-
-export function createInMemoryTaskStore(): Map<string, Task> {
-  const storage: Map<string, Task> = new Map<string, Task>();
-  return storage;
-}
-
-export function createTask(inputDetails: CreateTaskInput): Task {
-  const newTask: Task = {
-    id: randomUUID(),
-    title: inputDetails.title,
-    done: false,
-    category: inputDetails.category,
-    dueDate: inputDetails.dueDate,
-    createdAt: new Date().toISOString(),
-  };
-  return newTask;
-}
+import { randomUUID } from "node:crypto";
 
 export type TaskStore = {
-  createTask(input: CreateTaskInput): Promise<Task>;
-  deleteTask(id: string): Promise<boolean>;
-  listTasks(): Promise<Task[]>;
-  updateTaskStatus(id: string): Promise<Task | null>;
+  create(input: CreateTaskInput): Promise<Task>;
+  delete(id: string): Promise<boolean>;
+  list(): Promise<Task[]>;
+  toggleStatus(id: string): Promise<Task | null>;
 };
+
+export function createInMemoryTaskStore(): TaskStore {
+  const storage: Map<string, Task> = new Map<string, Task>();
+
+  const taskStore: TaskStore = {
+    async create(inputDetails) {
+      const newTask: Task = {
+        id: randomUUID(),
+        title: inputDetails.title,
+        done: false,
+        category: inputDetails.category,
+        dueDate: inputDetails.dueDate,
+        createdAt: new Date().toISOString(),
+      };
+      storage.set(newTask.id, newTask);
+      return { ...newTask };
+    },
+
+    async delete(id) {
+      return storage.delete(id);
+    },
+
+    async list() {
+      return Array.from(storage.values(), (task) => ({ ...task }));
+    },
+
+    async toggleStatus(id) {
+      // Replaces rather than mutates, so caller doesn't hold a reference into storage.
+      const task = storage.get(id);
+      if (task == undefined) return null;
+
+      const updated = { ...task, done: !task.done };
+      storage.set(id, updated);
+      return { ...updated };
+    },
+  };
+  return taskStore;
+}
