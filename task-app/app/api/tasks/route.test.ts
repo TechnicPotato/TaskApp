@@ -39,6 +39,25 @@ describe("GET /api/tasks", () => {
 });
 
 describe("POST /api/tasks", () => {
+  it("defaults dueDate to null when missing", async () => {
+    const request = makePostRequest({
+      title: "Plan the week",
+      category: " personal ",
+    });
+
+    const response = await POST(request);
+    const task = await response.json();
+    createdTaskIds.push(task.id);
+
+    expect(response.status).toBe(201);
+    expect(task).toMatchObject({
+      title: "Plan the week",
+      category: "personal",
+      done: false,
+      dueDate: null,
+    });
+  });
+
   it("creates a task with trimmed title from valid input", async () => {
     const request = makePostRequest({
       title: "  Plan the week  ",
@@ -84,6 +103,22 @@ describe("POST /api/tasks", () => {
       expectedIssue: {
         path: "category",
         message: "Category must be 200 characters or fewer.",
+      },
+    },
+    {
+      description: "impossible date",
+      payload: { title: "Test task", category: "c", dueDate: "2026-02-30" },
+      expectedIssue: {
+        path: "dueDate",
+        message: "Due date must be a real date in YYYY-MM-DD format.",
+      },
+    },
+    {
+      description: "bad date format",
+      payload: { title: "Test task", category: "c", dueDate: "01/11/2026" },
+      expectedIssue: {
+        path: "dueDate",
+        message: "Due date must be a real date in YYYY-MM-DD format.",
       },
     },
   ])("returns 400 for $description", async ({ payload, expectedIssue }) => {
