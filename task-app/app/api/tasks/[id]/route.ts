@@ -2,11 +2,10 @@ import { parseJsonBody } from "@/lib/http";
 import { setTaskDoneInputSchema } from "@/lib/tasks/schemas";
 import { taskStore } from "@/lib/tasks/store";
 
-type TaskRouteContext = {
-  params: Promise<{ id: string }>;
-};
-
-export async function PATCH(request: Request, { params }: TaskRouteContext) {
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext<"/api/tasks/[id]">,
+) {
   const { id } = await params;
   const parsed = await parseJsonBody(
     request,
@@ -23,7 +22,10 @@ export async function PATCH(request: Request, { params }: TaskRouteContext) {
   return Response.json(task);
 }
 
-export async function DELETE(_request: Request, { params }: TaskRouteContext) {
+export async function DELETE(
+  _request: Request,
+  { params }: RouteContext<"/api/tasks/[id]">,
+) {
   const { id } = await params;
   const deleted = await taskStore.delete(id);
 
