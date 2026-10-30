@@ -11,7 +11,10 @@ export const createTaskInputSchema = z.object({
     .trim()
     .min(1, "Category is required.")
     .max(200, "Category must be 200 characters or fewer."),
-  dueDate: z.iso.date().nullable().default(null),
+  dueDate: z.iso
+    .date("Due date must be a real date in YYYY-MM-DD format.")
+    .nullable()
+    .default(null),
 });
 
 export const setTaskDoneInputSchema = z.object({
