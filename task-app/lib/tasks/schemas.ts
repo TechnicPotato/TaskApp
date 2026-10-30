@@ -14,4 +14,8 @@ export const createTaskInputSchema = z.object({
   dueDate: z.iso.date().nullable(),
 });
 
+export const setTaskDoneInputSchema = z.object({
+  done: z.boolean(),
+});
+
 export type CreateTaskInput = z.infer<typeof createTaskInputSchema>;
