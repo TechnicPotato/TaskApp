@@ -1,3 +1,4 @@
+import { parseJsonBody } from "@/lib/http";
 import { setTaskDoneInputSchema } from "@/lib/tasks/schemas";
 import { taskStore } from "@/lib/tasks/store";
 
@@ -7,32 +8,14 @@ type TaskRouteContext = {
 
 export async function PATCH(request: Request, { params }: TaskRouteContext) {
   const { id } = await params;
-  let body: unknown;
+  const parsed = await parseJsonBody(
+    request,
+    setTaskDoneInputSchema,
+    "Invalid task update.",
+  );
+  if (!parsed.success) return parsed.response;
 
-  try {
-    body = await request.json();
-  } catch {
-    return Response.json(
-      { error: "Request body must be valid JSON." },
-      { status: 400 },
-    );
-  }
-
-  const result = setTaskDoneInputSchema.safeParse(body);
-  if (!result.success) {
-    return Response.json(
-      {
-        error: "Invalid task update.",
-        issues: result.error.issues.map((issue) => ({
-          path: issue.path.join("."),
-          message: issue.message,
-        })),
-      },
-      { status: 400 },
-    );
-  }
-
-  const task = await taskStore.setDone(id, result.data.done);
+  const task = await taskStore.setDone(id, parsed.data.done);
   if (task === null) {
     return Response.json({ error: "Task not found." }, { status: 404 });
   }
