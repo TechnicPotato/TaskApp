@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createInMemoryTaskStore } from "./store";
-import type { CreateTaskInput } from "./types";
+import type { CreateTaskInput } from "./schemas";
 
 function makeInput(overrides: Partial<CreateTaskInput> = {}): CreateTaskInput {
   return {
@@ -88,30 +88,42 @@ describe("TaskStore.list", () => {
   });
 });
 
-describe("TaskStore.toggleStatus", () => {
-  it("toggles a task's done status", async () => {
+describe("TaskStore.setDone", () => {
+  it("sets and stores the requested done status", async () => {
     const store = createInMemoryTaskStore();
     const task = await store.create(makeInput());
 
-    const completedTask = await store.toggleStatus(task.id);
+    const completedTask = await store.setDone(task.id, true);
     expect(completedTask?.done).toBe(true);
     expect(await store.list()).toEqual([{ ...task, done: true }]);
 
-    if (completedTask === null) {
-      throw new Error("Expected the task to be found");
-    }
-    completedTask.done = false;
-    expect(await store.list()).toEqual([{ ...task, done: true }]);
-
-    const reopenedTask = await store.toggleStatus(task.id);
+    const reopenedTask = await store.setDone(task.id, false);
     expect(reopenedTask?.done).toBe(false);
     expect(await store.list()).toEqual([task]);
+  });
+
+  it("is idempotent and returns a copy", async () => {
+    const store = createInMemoryTaskStore();
+    const task = await store.create(makeInput());
+
+    const firstResult = await store.setDone(task.id, true);
+    const secondResult = await store.setDone(task.id, true);
+
+    expect(firstResult?.done).toBe(true);
+    expect(secondResult?.done).toBe(true);
+    expect(await store.list()).toEqual([{ ...task, done: true }]);
+
+    if (firstResult === null) {
+      throw new Error("Expected the task to be found");
+    }
+    firstResult.done = false;
+    expect(await store.list()).toEqual([{ ...task, done: true }]);
   });
 
   it("returns null when the task does not exist", async () => {
     const store = createInMemoryTaskStore();
 
-    expect(await store.toggleStatus("missing-id")).toBeNull();
+    expect(await store.setDone("missing-id", true)).toBeNull();
   });
 });
 

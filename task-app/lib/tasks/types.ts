@@ -8,5 +8,3 @@ export type Task = {
   // UTC ISO string.
   createdAt: string;
 };
-
-export type CreateTaskInput = Pick<Task, "title" | "category" | "dueDate">;

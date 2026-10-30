@@ -1,11 +1,12 @@
-import type { Task, CreateTaskInput } from "./types";
+import type { CreateTaskInput } from "./schemas";
+import type { Task } from "./types";
 import { randomUUID } from "node:crypto";
 
 export type TaskStore = {
   create(input: CreateTaskInput): Promise<Task>;
   delete(id: string): Promise<boolean>;
   list(): Promise<Task[]>;
-  toggleStatus(id: string): Promise<Task | null>;
+  setDone(id: string, done: boolean): Promise<Task | null>;
 };
 
 export function createInMemoryTaskStore(): TaskStore {
@@ -33,15 +34,17 @@ export function createInMemoryTaskStore(): TaskStore {
       return Array.from(storage.values(), (task) => ({ ...task }));
     },
 
-    async toggleStatus(id) {
+    async setDone(id, done) {
       // Replaces rather than mutates, so caller doesn't hold a reference into storage.
       const task = storage.get(id);
       if (task === undefined) return null;
 
-      const updated = { ...task, done: !task.done };
+      const updated = { ...task, done };
       storage.set(id, updated);
       return { ...updated };
     },
   };
   return taskStore;
 }
+
+export const taskStore = createInMemoryTaskStore();
