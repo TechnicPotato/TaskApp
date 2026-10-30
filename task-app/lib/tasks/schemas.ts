@@ -5,12 +5,12 @@ export const createTaskInputSchema = z.object({
     .string()
     .trim()
     .min(1, "Title is required.")
-    .max(200, "200 character maximum for Title"),
+    .max(200, "Title must be 200 characters or fewer."),
   category: z
     .string()
     .trim()
     .min(1, "Category is required.")
-    .max(200, "200 character maximum for Category"),
+    .max(200, "Category must be 200 characters or fewer."),
   dueDate: z.iso.date().nullable(),
 });
 
