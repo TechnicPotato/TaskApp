@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createInMemoryTaskStore } from "./store";
-import type { CreateTaskInput } from "./types";
+import type { CreateTaskInput } from "./schemas";
 
 function makeInput(overrides: Partial<CreateTaskInput> = {}): CreateTaskInput {
   return {

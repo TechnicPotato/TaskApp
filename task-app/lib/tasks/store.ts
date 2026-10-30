@@ -1,4 +1,5 @@
-import type { Task, CreateTaskInput } from "./types";
+import type { CreateTaskInput } from "./schemas";
+import type { Task } from "./types";
 import { randomUUID } from "node:crypto";
 
 export type TaskStore = {
@@ -45,3 +46,5 @@ export function createInMemoryTaskStore(): TaskStore {
   };
   return taskStore;
 }
+
+export const taskStore = createInMemoryTaskStore();
