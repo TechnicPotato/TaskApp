@@ -47,4 +47,9 @@ export function createInMemoryTaskStore(): TaskStore {
   return taskStore;
 }
 
-export const taskStore = createInMemoryTaskStore();
+const globalForTaskStore = globalThis as unknown as {
+  taskStore?: TaskStore;
+};
+
+export const taskStore = (globalForTaskStore.taskStore ??=
+  createInMemoryTaskStore());
