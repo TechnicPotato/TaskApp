@@ -13,8 +13,8 @@ export async function TaskList() {
         <li key={task.id} className="flex gap-2">
           <span>{task.title}</span>
           <span className="text-gray-500">{task.category}</span>
-          {task.dueDate && <span> due {task.dueDate}</span>}
-          {task.done ? " ✓" : ""}
+          {task.dueDate && <span>due{task.dueDate}</span>}
+          {task.done ? "✓" : ""}
         </li>
       ))}
     </ul>
