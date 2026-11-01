@@ -1,5 +1,4 @@
 import { connection } from "next/server";
-import type { Task } from "@/lib/tasks/types";
 import { taskStore } from "@/lib/tasks/store";
 
 export async function TaskList() {
@@ -11,10 +10,11 @@ export async function TaskList() {
   return (
     <ul>
       {tasks.map((task) => (
-        <li key={task.id}>
-          {task.title}
+        <li key={task.id} className="flex gap-2">
+          <span>{task.title}</span>
+          <span className="text-gray-500">{task.category}</span>
           {task.dueDate && <span> due {task.dueDate}</span>}
-          {task.done ? "✓" : ""}
+          {task.done ? " ✓" : ""}
         </li>
       ))}
     </ul>
