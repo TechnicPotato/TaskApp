@@ -1,4 +1,5 @@
 import type { Task } from "@/lib/tasks/types";
+import { DeleteTaskButton } from "./delete-task-button";
 import { TaskCheckbox } from "./task-checkbox";
 
 type TaskItemProps = {
@@ -14,6 +15,7 @@ export function TaskItem({ task }: TaskItemProps) {
       </span>
       <span className="text-gray-500">{task.category}</span>
       {task.dueDate && <span>due {task.dueDate}</span>}
+      <DeleteTaskButton id={task.id} title={task.title} />
     </li>
   );
 }
