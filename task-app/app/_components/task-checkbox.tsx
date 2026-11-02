@@ -2,13 +2,15 @@
 
 import type { Task } from "@/lib/tasks/types";
 import { useRouter } from "next/navigation";
-import { useState, type ChangeEvent } from "react";
+import { useState, useTransition, type ChangeEvent } from "react";
 
 type TaskCheckboxProps = Pick<Task, "id" | "done" | "title">;
 
 export function TaskCheckbox({ id, done, title }: TaskCheckboxProps) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  // Stays true until the refreshed list has rendered.
+  const [isRefreshing, startTransition] = useTransition();
 
   async function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const nextDone = event.currentTarget.checked;
@@ -22,11 +24,11 @@ export function TaskCheckbox({ id, done, title }: TaskCheckboxProps) {
       });
 
       if (response.ok) {
-        router.refresh();
+        startTransition(() => router.refresh());
         return;
       }
       if (response.status === 404) {
-        router.refresh();
+        startTransition(() => router.refresh());
         return;
       }
       console.error(`Failed to update task: ${response.status}`);
@@ -41,9 +43,9 @@ export function TaskCheckbox({ id, done, title }: TaskCheckboxProps) {
     <input
       type="checkbox"
       checked={done}
-      aria-label={`Mark ${title} as done`}
+      aria-label={title}
       onChange={handleChange}
-      disabled={isSaving}
+      disabled={isSaving || isRefreshing}
     />
   );
 }

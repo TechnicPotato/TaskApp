@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type SubmitEvent } from "react";
+import { useState, useTransition, type SubmitEvent } from "react";
 
 type ApiErrorBody = {
   error: string;
@@ -18,6 +18,9 @@ export function AddTaskForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // Stays true until the refreshed list has rendered.
+  const [isRefreshing, startTransition] = useTransition();
+  const isBusy = isSubmitting || isRefreshing;
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,7 +49,7 @@ export function AddTaskForm() {
 
       if (response.ok) {
         form.reset();
-        router.refresh();
+        startTransition(() => router.refresh());
         return;
       }
 
@@ -98,12 +101,11 @@ export function AddTaskForm() {
         </p>
       )}
       <button
-        className="rounded border px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed
-"
+        className="rounded border px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
         type="submit"
-        disabled={isSubmitting}
+        disabled={isBusy}
       >
-        {isSubmitting ? "Adding Task..." : "Add Task"}
+        {isBusy ? "Adding Task..." : "Add Task"}
       </button>
     </form>
   );
