@@ -23,7 +23,9 @@ export function createInMemoryTaskStore(): TaskStore {
     },
 
     async list() {
-      return Array.from(storage.values(), (task) => ({ ...task }));
+      return Array.from(storage.values(), (task) => ({ ...task })).sort(
+        (a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt),
+      );
     },
 
     async setDone(id, done) {

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { CreateTaskInput } from "./schemas";
 import type { TaskStore } from "./types";
 
@@ -89,6 +89,24 @@ export function describeTaskStoreContract(
 
       const [storedTask] = await store.list();
       expect(storedTask.title).toBe("Original title");
+    });
+
+    it("returns tasks oldest first by createdAt", async () => {
+      // Only fake Date, so real stores can still use timers for I/O.
+      vi.useFakeTimers({ toFake: ["Date"] });
+      try {
+        const store = await createStore();
+
+        // Created newest first, so insertion order alone can't pass this test.
+        vi.setSystemTime(new Date("2026-01-02T00:00:00.000Z"));
+        const newerTask = await store.create(makeInput({ title: "Newer" }));
+        vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+        const olderTask = await store.create(makeInput({ title: "Older" }));
+
+        expect(await store.list()).toEqual([olderTask, newerTask]);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

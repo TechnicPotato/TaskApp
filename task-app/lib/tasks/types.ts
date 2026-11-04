@@ -14,6 +14,7 @@ export type Task = {
 export type TaskStore = {
   create(input: CreateTaskInput): Promise<Task>;
   delete(id: string): Promise<boolean>;
+  // Order defined by oldest first (createdAt ascending)
   list(): Promise<Task[]>;
   setDone(id: string, done: boolean): Promise<Task | null>;
 };
