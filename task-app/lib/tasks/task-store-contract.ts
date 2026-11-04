@@ -14,6 +14,7 @@ function makeInput(overrides: Partial<CreateTaskInput> = {}): CreateTaskInput {
 export function describeTaskStoreContract(
   createStore: () => Promise<TaskStore>,
 ) {
+  // Tests run under the assumption that createStore() returns an empty store.
   describe("TaskStore.create", () => {
     it("creates and stores a task", async () => {
       const store = await createStore();
