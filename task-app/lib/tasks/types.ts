@@ -1,3 +1,5 @@
+import type { CreateTaskInput } from "./schemas";
+
 export type Task = {
   id: string;
   title: string;
@@ -7,4 +9,12 @@ export type Task = {
   dueDate: string | null;
   // UTC ISO string.
   createdAt: string;
+};
+
+export type TaskStore = {
+  create(input: CreateTaskInput): Promise<Task>;
+  delete(id: string): Promise<boolean>;
+  // Order defined by oldest first (createdAt ascending)
+  list(): Promise<Task[]>;
+  setDone(id: string, done: boolean): Promise<Task | null>;
 };
