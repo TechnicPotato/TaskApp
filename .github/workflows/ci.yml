@@ -43,8 +43,10 @@ jobs:
           distribution: temurin
           java-version: "25"
 
-      - name: Install Firestore emulator
-        run: sudo apt-get install -y google-cloud-cli-firestore-emulator
+      - name: Set up gcloud with Firestore emulator
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          install_components: cloud-firestore-emulator
 
       - name: Start Firestore emulator
         run: gcloud emulators firestore start --host-port=127.0.0.1:8080 > emulator.log 2>&1 &
