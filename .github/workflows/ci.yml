@@ -17,21 +17,55 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v7
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
           node-version-file: task-app/.nvmrc
           cache: npm
           cache-dependency-path: task-app/package-lock.json
+
       - name: Install NPM Dependencies
         run: npm ci
+
       - name: Check formatting
         run: npm run format:check
+
       - name: Lint
         run: npm run lint
+
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Install Firestore emulator
+        run: sudo apt-get install -y google-cloud-cli-firestore-emulator
+
+      - name: Start Firestore emulator
+        run: gcloud emulators firestore start --host-port=127.0.0.1:8080 > emulator.log 2>&1 &
+
+      - name: Wait for Firestore emulator
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl -s http://127.0.0.1:8080 > /dev/null; then
+              echo "Emulator is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Emulator did not start in time"
+          cat emulator.log
+          exit 1
+
       - name: Run unit tests
         run: npm run test:run
+        env:
+          FIRESTORE_EMULATOR_HOST: "127.0.0.1:8080"
+
       - name: Build
         run: npm run build
