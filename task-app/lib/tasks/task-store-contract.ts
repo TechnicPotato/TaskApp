@@ -147,6 +147,15 @@ export function describeTaskStoreContract(
 
       expect(await store.setDone("missing-id", true)).toBeNull();
     });
+
+    it.each(["a/b", ".."])(
+      "returns null for an ID that cannot exist (%s)",
+      async (id) => {
+        const store = await createStore();
+
+        expect(await store.setDone(id, true)).toBeNull();
+      },
+    );
   });
 
   describe("TaskStore.delete", () => {
@@ -174,5 +183,14 @@ export function describeTaskStoreContract(
 
       expect(await store.delete("missing-id")).toBe(false);
     });
+
+    it.each(["a/b", ".."])(
+      "returns false for an ID that cannot exist (%s)",
+      async (id) => {
+        const store = await createStore();
+
+        expect(await store.delete(id)).toBe(false);
+      },
+    );
   });
 }
