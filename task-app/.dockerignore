@@ -1,0 +1,32 @@
+# --- Version Control & CI/CD ---
+.gitignore
+
+# --- Local Secrets & Configs ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+secrets.txt
+
+# --- Operating System & Editor Noisy Files ---
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+
+# --- Package Managers & Source Dependencies ---
+node_modules/
+
+# --- Build Artifacts & Output Directories ---
+.next/
+tsconfig.tsbuildinfo
+
+# --- Logging ---
+*.log
+coverage/
+
+# --- Docker ---
+Dockerfile
+.dockerignore
