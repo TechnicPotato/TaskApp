@@ -71,3 +71,62 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Docker build
+        run: |
+          docker build -t task-app:ci .
+
+      - name: Run Docker container
+        run: docker run --detach --name task-app -e TASK_STORE=memory -p 3000:8080 task-app:ci
+
+      - name: Wait for app and check static asset
+        run: |
+          app_ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              echo "App is ready"
+              app_ready=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$app_ready" != true ]; then
+            echo "App did not start in time"
+            docker logs task-app
+            exit 1
+          fi
+
+          if ! curl --fail --silent --show-error http://127.0.0.1:3000/file.svg --output /dev/null; then
+            echo "Static asset /file.svg failed to load"
+            docker logs task-app
+            exit 1
+          fi
+          echo "Static asset /file.svg loaded"
+
+          if ! curl --fail --silent http://127.0.0.1:3000/ > page.html; then
+            echo "Could not retrieve homepage HTML for the CSS bundle check"
+            docker logs task-app
+            exit 1
+          fi
+          css_path=$(grep -o '/_next/static/[^\"]*\.css' page.html | head -n 1)
+          if [ -z "$css_path" ]; then
+            echo "No Next.js CSS bundle path found in the homepage HTML"
+            docker logs task-app
+            exit 1
+          fi
+
+          if ! curl --fail --silent --show-error "http://127.0.0.1:3000${css_path}" --output /dev/null; then
+            echo "Next.js CSS bundle failed to load: ${css_path}"
+            docker logs task-app
+            exit 1
+          fi
+          echo "Next.js CSS bundle loaded: ${css_path}"
