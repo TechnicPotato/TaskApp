@@ -1,0 +1,31 @@
+# Repo-wide safety net for secrets. These rules apply in every folder.
+# App-specific ignores live in task-app/.gitignore.
+
+# Environment files (real values). The committed template is .env.example.
+.env
+.env.*
+!.env.example
+
+# Keys and credential files. Never commit service account keys (CI uses WIF).
+*.pem
+*.key
+*.p12
+*.pfx
+*-key.json
+*credentials*.json
+gha-creds-*.json
+
+# Terraform (2h). State can contain secrets in plain text and lives in GCS.
+# .terraform.lock.hcl is NOT ignored; it must be committed.
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+
+# OS clutter
+.DS_Store
+Thumbs.db
