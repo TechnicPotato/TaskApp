@@ -131,9 +131,37 @@ jobs:
           fi
           echo "Next.js CSS bundle loaded: ${css_path}"
 
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.17.1"
+
+      - name: Check formatting for Terraform
+        run: |
+          terraform fmt -check -recursive -diff
+
+      - name: Initialise Terraform
+        run: |
+          terraform init -backend=false
+
+      - name: Terraform Validation
+        run: |
+          terraform validate
+
   deploy:
     name: Deploy
-    needs: [docker, checks]
+    needs: [docker, checks, terraform]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
