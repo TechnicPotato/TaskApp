@@ -9,3 +9,9 @@ variable "region" {
   description = "Target Google Cloud Region for all deployed resources"
   default     = "australia-southeast1"
 }
+
+variable "github_repository" {
+  type        = string
+  description = "GitHub repository (owner/name) allowed to deploy via WIF"
+  default     = "TechnicPotato/TaskApp"
+}
