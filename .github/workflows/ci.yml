@@ -175,7 +175,6 @@ jobs:
     env:
       REGION: ${{ vars.GCP_REGION }}
       PROJECT: ${{ vars.GCP_PROJECT_ID }}
-      RUNTIME_SA: task-app-run@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/task-app/task-app:${{ github.sha }}
       SERVICE: task-app
 
@@ -209,10 +208,5 @@ jobs:
           gcloud run deploy "$SERVICE" \
           --image "$IMAGE" \
           --region "$REGION" \
-          --service-account "$RUNTIME_SA" \
           --project "$PROJECT" \
-          --set-env-vars TASK_STORE=firestore \
-          --max-instances 2 \
-          --min-instances 0 \
-          --no-allow-unauthenticated \
           --quiet
