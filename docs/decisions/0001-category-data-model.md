@@ -18,7 +18,9 @@ Free text causes problems as soon as categories matter:
 
 ### 1. A category is its own entity, and tasks refer to it by ID
 
-Categories live in their own Firestore collection. Each one has at least an `id`, a `name` and a `createdAt`. A task stores `categoryId` instead of a name.
+Categories live in their own Firestore collection. Each one has an `id` and a `name` (plus a `userId` from Phase 4). A task stores `categoryId` instead of a name.
+
+There is deliberately no `createdAt` field. Nothing reads it: categories are listed by name, and creation time isn't shown anywhere. If it's ever needed, Firestore records a `createTime` on every document.
 
 **Why:**
 - Each task has at most one category, and categories are the main way the list is grouped. Things you group by are normally first-class objects; Todoist's projects and Microsoft To Do's lists work this way.
@@ -43,7 +45,7 @@ Each category is stored as two documents:
 
 | Document | ID | Purpose |
 | --- | --- | --- |
-| `categories/{id}` | Random, never changes | The category itself (`name`, `createdAt`, later `userId`). Tasks refer to this ID. |
+| `categories/{id}` | Random, never changes | The category itself (`name`, later `userId`). Tasks refer to this ID. |
 | `categoryNames/{key}` | The normalised name (from Phase 4: user ID plus normalised name) | Reserves the name. Holds the `categoryId` it belongs to. |
 
 Every write that touches a name uses **one transaction** that changes both documents:
