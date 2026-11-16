@@ -152,15 +152,10 @@ docker push $IMAGE
 
 gcloud run deploy $SERVICE `
   --image $IMAGE `
-  --region $REGION `
-  --service-account $RUNTIME_SA `
-  --set-env-vars TASK_STORE=firestore `
-  --max-instances 2 `
-  --min-instances 0 `
-  --no-allow-unauthenticated
+  --region $REGION
 ```
 
-Each deploy creates a new immutable **revision** and sends all traffic to it.
+Each deploy creates a new immutable **revision** and sends all traffic to it. Service settings (runtime identity, scaling, env vars) come from Terraform in `infra/cloud_run.tf`; this only changes the image.
 
 ## Testing
 
