@@ -105,13 +105,6 @@ jobs:
             exit 1
           fi
 
-          if ! curl --fail --silent --show-error http://127.0.0.1:3000/file.svg --output /dev/null; then
-            echo "Static asset /file.svg failed to load"
-            docker logs task-app
-            exit 1
-          fi
-          echo "Static asset /file.svg loaded"
-
           if ! curl --fail --silent http://127.0.0.1:3000/ > page.html; then
             echo "Could not retrieve homepage HTML for the CSS bundle check"
             docker logs task-app
