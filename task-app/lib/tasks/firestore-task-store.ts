@@ -4,10 +4,10 @@ import {
   Timestamp,
   type FirestoreDataConverter,
   type QueryDocumentSnapshot,
-  GrpcStatus,
 } from "@google-cloud/firestore";
 import type { Task, TaskStore } from "./types";
 import { z } from "zod";
+import { isValidDocumentId, isNotFoundError } from "../firestore";
 
 const taskDocumentSchema = z.object({
   title: z.string(),
@@ -46,27 +46,6 @@ const taskConverter: FirestoreDataConverter<Task, TaskDocument> = {
     };
   },
 };
-
-function isNotFoundError(error: unknown): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === GrpcStatus.NOT_FOUND
-  );
-}
-
-// Validates against Firestore's document ID rules.
-function isValidDocumentId(id: string): boolean {
-  return (
-    id !== "" && // not empty
-    !id.includes("/") && // "/" separates path segments
-    id !== "." &&
-    id !== ".." && // reserved by Firestore
-    !/^__.*__$/.test(id) && // __double-underscore__ IDs are reserved
-    Buffer.byteLength(id, "utf8") <= 1500 // the size limit is in bytes, not characters
-  );
-}
 
 export function createFirestoreTaskStore(
   firestore: Firestore,
